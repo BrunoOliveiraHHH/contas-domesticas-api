@@ -3,8 +3,7 @@ package br.com.contasdomesticas.api.service;
 import br.com.contasdomesticas.api.domain.Usuario;
 import br.com.contasdomesticas.api.dto.UsuarioRequest;
 import br.com.contasdomesticas.api.dto.UsuarioResponse;
-import br.com.contasdomesticas.api.exception.LoginJaExisteException;
-import br.com.contasdomesticas.api.exception.RecursoNaoEncontradoException;
+import br.com.contasdomesticas.api.exception.AplicacaoException;
 import br.com.contasdomesticas.api.mapper.UsuarioMapper;
 import br.com.contasdomesticas.api.repository.UsuarioRepository;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.existsByLogin("joao")).thenReturn(true);
 
         assertThatThrownBy(() -> usuarioService.criar(request))
-                .isInstanceOf(LoginJaExisteException.class);
+                .isInstanceOf(AplicacaoException.class);
 
         verify(usuarioRepository, never()).save(any());
     }
@@ -72,6 +71,6 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> usuarioService.buscarPorId(99L))
-                .isInstanceOf(RecursoNaoEncontradoException.class);
+                .isInstanceOf(AplicacaoException.class);
     }
 }

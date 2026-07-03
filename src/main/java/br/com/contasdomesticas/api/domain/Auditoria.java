@@ -1,8 +1,6 @@
 package br.com.contasdomesticas.api.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,24 +16,28 @@ import java.time.Instant;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Auditoria extends BaseEntity {
+public class Auditoria {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /** Login do usuario autenticado (ou "anonimo" quando nao houver). */
-    @Column(name = "usuario", length = 100)
+    @Column(name = "usuario", length = 100, nullable = false)
     private String usuario;
 
-    @Column(name = "metodo_http", length = 10)
+    @Column(name = "metodo_http", length = 10, nullable = false)
     private String metodoHttp;
 
-    @Column(name = "endpoint", length = 500)
+    @Column(name = "endpoint", length = 500, nullable = false)
     private String endpoint;
 
-    @Column(name = "status_resposta")
+    @Column(name = "status_resposta", nullable = false)
     private Integer statusResposta;
 
-    @Column(name = "endereco_ip", length = 45)
+    @Column(name = "endereco_ip", length = 45, nullable = false)
     private String enderecoIp;
 
-    @Column(name = "data_hora")
+    @Column(name = "data_hora", nullable = false)
     private Instant dataHora;
 }

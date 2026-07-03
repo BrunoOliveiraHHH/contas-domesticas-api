@@ -114,7 +114,7 @@ class UsuarioControllerIntegrationTest {
     void deveRetornar404ParaUsuarioInexistente() throws Exception {
         mockMvc.perform(get("/api/v1/usuarios/{id}", 999999))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.title").value("Recurso nao encontrado"));
+                .andExpect(jsonPath("$.title").value("Usuário não encontrado com o id: 999999"));
     }
 
     @Test

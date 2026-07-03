@@ -19,17 +19,10 @@ import java.util.Map;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public ProblemDetail handleNaoEncontrado(RecursoNaoEncontradoException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problem.setTitle("Recurso nao encontrado");
-        return problem;
-    }
-
-    @ExceptionHandler(LoginJaExisteException.class)
-    public ProblemDetail handleLoginDuplicado(LoginJaExisteException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
-        problem.setTitle("Conflito de dados");
+    @ExceptionHandler(AplicacaoException.class)
+    public ProblemDetail handleAplicacaoException(AplicacaoException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
+        problem.setTitle(ex.getMensagem());
         return problem;
     }
 

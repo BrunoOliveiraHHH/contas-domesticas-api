@@ -19,14 +19,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Usuario extends EntidadeAuditavel {
+public class Usuario extends BaseEntity {
 
-    @Column(name = "login", nullable = false, length = 100)
+    @Column(name = "login", nullable = false)
     private String login;
 
-    @Column(name = "nome_exibicao", nullable = false, length = 150)
+    @Column(name = "nome_exibicao", nullable = false)
     private String nomeExibicao;
 
-    @Column(name = "senha", nullable = false, length = 255)
+    @Column(name = "senha", nullable = false)
     private String senha;
 }

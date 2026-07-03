@@ -2,6 +2,25 @@
 
 API backend do projeto **Contas Domésticas**.
 
+## Propósito
+
+O **Contas Domésticas** é um app de uso próprio (família) que unifica, num só produto:
+
+- **Finanças familiar e individual** — receitas, despesas e investimentos separados por **carteira**
+  (compartilhada ou privada), com recorrência, parcelamento e **rateio** entre as pessoas.
+- **Listas de compras** — mantimentos e material de construção, com itens por **unidade, peso (kg) ou
+  volume (L)**, preço estimado × real e **histórico de preço** por mercado; ao fechar, a lista vira
+  uma despesa.
+- **Investimentos** — aportes, evolução patrimonial e reserva de emergência.
+- **Calculadoras** — investimento, IR sobre investimentos, financiamento (Price/SAC) e preço por
+  unidade.
+- **Configuração parametrizável** — índices (Selic, CDI, IPCA) e alíquotas (IR/IOF).
+
+Esta **API é local** e cumpre dois papéis: expor o domínio (CRUDs, relatórios) e servir de ponto de
+**sincronização** entre os celulares (conflitos resolvidos pelo registro mais recente). Já
+implementado: **Usuário** + **Auditoria** (log automático de cada requisição). O roadmap completo está
+em `PLANO-api.md` (raiz do workspace).
+
 ## Stack
 
 - Java 17
@@ -46,7 +65,8 @@ Conexão local configurada em `application.yml`:
 | senha | `contasapi` |
 
 Os scripts de criação de role/database ficam no repositório `contas-domesticas-db`.
-Migrações Flyway em `src/main/resources/db/migration` (`V1__*.sql`, ...).
+Migrações Flyway em `src/main/resources/db/migration` (`V1__*.sql`, ...) — **fonte de verdade** do
+schema, espelhada no repo `contas-domesticas-db`.
 
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - Actuator health: `http://localhost:8080/actuator/health`
@@ -54,9 +74,9 @@ Migrações Flyway em `src/main/resources/db/migration` (`V1__*.sql`, ...).
 ## Estrutura
 
 ```
-src/main/java/br/com/contasdomesticas/api/   # código-fonte
-src/main/resources/application.yml           # configuração
-src/test/java/br/com/contasdomesticas/api/   # testes
+src/main/java/br/com/contasdomesticas/api/   # domain, repository, dto, mapper, service, controller, config, audit, exception
+src/main/resources/application.yml           # configuração (+ db/migration Flyway)
+src/test/java/br/com/contasdomesticas/api/   # testes (repository, service, integração)
 ```
 
 ## Executar
@@ -70,3 +90,8 @@ src/test/java/br/com/contasdomesticas/api/   # testes
 ```bash
 ./mvnw clean package
 ```
+
+## Documentação
+
+- Roadmap de desenvolvimento: `PLANO-api.md` (raiz do workspace).
+- Tarefas (modelo ClickUp): `contas-domesticas-documentacao/sprint-1/api/`.

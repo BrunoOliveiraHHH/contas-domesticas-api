@@ -1,0 +1,16 @@
+# Normaliza fim de linha: texto em LF no repositorio.
+* text=auto eol=lf
+
+# Scripts Windows permanecem CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binarios (nunca normalizar).
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.keystore binary
+*.jks binary

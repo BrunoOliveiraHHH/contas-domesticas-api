@@ -7,16 +7,32 @@ API backend do projeto **Contas Domésticas**.
 - Java 17
 - Spring Boot 3.5.16
 - Spring Web / Spring Data JPA
+- Spring Security + JWT (jjwt) — infraestrutura (config/filtros na próxima rodada)
 - PostgreSQL (driver) — conexão local
 - Flyway (migrações de banco)
 - Jakarta Bean Validation
-- Spring Boot Actuator
+- Spring Boot Actuator (health/info com build + git)
 - Jackson (suporte a `java.time` via jsr310)
 - springdoc-openapi / Swagger UI
-- MapStruct
-- Lombok
-- Spring Boot Configuration Processor (metadados para `application.yml`)
+- MapStruct / Lombok
+- H2 (testes em memória) + spring-security-test
+- JaCoCo (cobertura) · DevTools (dev)
 - Maven
+
+## Profiles
+
+| Profile | Banco | Uso |
+|---------|-------|-----|
+| `dev` (default) | PostgreSQL local | desenvolvimento |
+| `test` | H2 em memória | testes (forçado pelo surefire) |
+
+## Testes & cobertura
+
+```bash
+./mvnw verify   # roda no profile test (H2) e gera JaCoCo em target/site/jacoco/
+```
+
+CI: GitHub Actions (`.github/workflows/ci.yml`) roda `verify` a cada push/PR.
 
 ## Banco de dados
 

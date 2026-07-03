@@ -10,6 +10,8 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+    # Roda o data.sql (seed de teste) apos o Hibernate criar o schema.
+    defer-datasource-initialization: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
@@ -17,3 +19,7 @@ spring:
   # Flyway desabilitado nos testes (schema gerado pelo Hibernate).
   flyway:
     enabled: false
+
+  sql:
+    init:
+      mode: always

@@ -1,6 +1,8 @@
 package br.com.contasdomesticas.api.controller;
 
 import br.com.contasdomesticas.api.domain.StatusLista;
+import br.com.contasdomesticas.api.dto.FecharListaRequest;
+import br.com.contasdomesticas.api.dto.LancamentoResponse;
 import br.com.contasdomesticas.api.dto.ListaCompraRequest;
 import br.com.contasdomesticas.api.dto.ListaCompraResponse;
 import br.com.contasdomesticas.api.service.ListaCompraService;
@@ -46,6 +48,17 @@ public class ListaCompraController {
     @PutMapping("/{id}")
     public ListaCompraResponse atualizar(@PathVariable Long id, @Valid @RequestBody ListaCompraRequest request) {
         return listaCompraService.atualizar(id, request);
+    }
+
+    @PostMapping("/{id}/fechar")
+    public List<LancamentoResponse> fechar(@PathVariable Long id, @Valid @RequestBody FecharListaRequest request) {
+        return listaCompraService.fechar(id, request);
+    }
+
+    @PostMapping("/{id}/duplicar")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ListaCompraResponse duplicar(@PathVariable Long id) {
+        return listaCompraService.duplicar(id);
     }
 
     @DeleteMapping("/{id}")

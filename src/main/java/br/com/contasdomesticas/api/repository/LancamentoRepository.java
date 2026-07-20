@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
@@ -15,4 +16,6 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
         TipoLancamento tipo, LocalDate inicio, LocalDate fim);
 
     List<Lancamento> findByCarteiraId(Long carteiraId);
+
+    Optional<Lancamento> findByRecorrenciaIdAndDataCompetencia(Long recorrenciaId, LocalDate dataCompetencia);
 }

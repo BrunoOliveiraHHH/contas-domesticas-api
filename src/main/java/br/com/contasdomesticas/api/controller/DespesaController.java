@@ -3,7 +3,9 @@ package br.com.contasdomesticas.api.controller;
 import br.com.contasdomesticas.api.dto.DespesaRequest;
 import br.com.contasdomesticas.api.dto.LancamentoResponse;
 import br.com.contasdomesticas.api.dto.PagamentoRequest;
+import br.com.contasdomesticas.api.dto.ParcelamentoRequest;
 import br.com.contasdomesticas.api.service.DespesaService;
+import br.com.contasdomesticas.api.service.ParcelamentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,17 @@ import java.util.List;
 public class DespesaController {
 
     private final DespesaService despesaService;
+    private final ParcelamentoService parcelamentoService;
 
     @GetMapping
     public List<LancamentoResponse> listar() {
         return despesaService.listar();
+    }
+
+    @PostMapping("/parceladas")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<LancamentoResponse> parcelar(@Valid @RequestBody ParcelamentoRequest request) {
+        return parcelamentoService.gerarParceladas(request);
     }
 
     @GetMapping("/{id}")

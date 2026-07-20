@@ -15,6 +15,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * Nucleo compartilhado por receita e despesa. O escopo (familiar/individual) e
@@ -70,4 +71,18 @@ public class Lancamento extends BaseEntity {
 
     @Column(name = "anexo_url", length = 300)
     private String anexoUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recorrencia_id",
+        foreignKey = @ForeignKey(name = "fk_lancamento_recorrencia"))
+    private Recorrencia recorrencia;
+
+    @Column(name = "grupo_parcela")
+    private UUID grupoParcela;
+
+    @Column(name = "numero_parcela")
+    private Integer numeroParcela;
+
+    @Column(name = "total_parcelas")
+    private Integer totalParcelas;
 }

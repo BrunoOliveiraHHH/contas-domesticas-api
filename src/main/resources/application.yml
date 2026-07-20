@@ -47,6 +47,11 @@ app:
       secret: "contas-domesticas-api-669e51a7ead5e2e64d532aeac2ebdfa94f6c56fca27303f7dfb5d30196371c82"
       access-expiration: 15m
       refresh-expiration: 7d
+  cors:
+    # Origens permitidas (o frontend Quasar roda em :9000). Separe por virgula se precisar de mais.
+    allowed-origins: "http://localhost:9000"
+    # Habilita padroes de rede local (localhost/127.0.0.1/192.168.*) em desenvolvimento.
+    dev-patterns-enabled: true
 
 management:
   endpoints:

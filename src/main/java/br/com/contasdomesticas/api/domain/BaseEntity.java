@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Base de todas as entidades: identificador tecnico (surrogate key) + campos de auditoria.
@@ -40,6 +41,27 @@ public abstract class BaseEntity {
     @LastModifiedBy
     @Column(name = "atualizado_por", length = 100)
     private String atualizadoPor;
+
+    // --- Sincronizacao entre instancias (app/front <-> API) ---
+
+    /** Identidade estavel gerada no cliente/servidor; base do upsert por sync. */
+    @Column(name = "uuid", unique = true, updatable = false)
+    private UUID uuid;
+
+    /** Versao para resolucao de conflito (last-write-wins pela maior versao). */
+    @Column(name = "versao", nullable = false, columnDefinition = "bigint default 0")
+    private Long versao = 0L;
+
+    /** Soft-delete: funciona como tombstone na sincronizacao. */
+    @Column(name = "deletado", nullable = false, columnDefinition = "boolean default false")
+    private boolean deletado = false;
+
+    @PrePersist
+    void aoPersistir() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

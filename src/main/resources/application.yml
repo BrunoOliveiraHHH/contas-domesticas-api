@@ -2,6 +2,10 @@ spring:
   application:
     name: contas-domesticas-api
 
+  # Carrega variaveis do .env na raiz do projeto (nao versionado), se existir.
+  config:
+    import: "optional:file:./.env[.properties]"
+
   profiles:
     active: dev
 
@@ -29,7 +33,7 @@ spring:
       fail-on-unknown-properties: false
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   shutdown: graceful
   compression:
     enabled: true

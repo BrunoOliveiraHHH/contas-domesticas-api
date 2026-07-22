@@ -1,9 +1,9 @@
 spring:
   # Conexao local PostgreSQL (uso proprio — credenciais hardcoded).
   datasource:
-    url: jdbc:postgresql://localhost:5432/contasdomesticas
-    username: contasdomesticas
-    password: contasapi
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/contasdomesticas}
+    username: ${DB_USERNAME:contasdomesticas}
+    password: ${DB_PASSWORD:contasapi}
     driver-class-name: org.postgresql.Driver
     hikari:
       pool-name: contasdomesticas-pool

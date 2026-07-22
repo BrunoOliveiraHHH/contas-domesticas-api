@@ -2,6 +2,7 @@ package br.com.contasdomesticas.api.exception;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,6 +24,14 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleAplicacaoException(AplicacaoException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
         problem.setTitle(ex.getMensagem());
+        return problem;
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleIntegridade(DataIntegrityViolationException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+                "Nao foi possivel concluir a operacao: existem registros vinculados.");
+        problem.setTitle("Conflito de integridade");
         return problem;
     }
 

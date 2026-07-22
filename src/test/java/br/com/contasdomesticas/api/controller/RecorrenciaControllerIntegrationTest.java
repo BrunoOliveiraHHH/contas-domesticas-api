@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -84,5 +85,23 @@ class RecorrenciaControllerIntegrationTest {
     void deveRetornar404ParaRecorrenciaInexistente() throws Exception {
         mockMvc.perform(get("/api/v1/recorrencias/{id}", 999999))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveRemoverRecorrenciaMesmoComLancamentoGerado() throws Exception {
+        long id = recorrenciaDespesa();
+
+        // Gera um lancamento vinculado a recorrencia
+        MvcResult g = mockMvc.perform(post("/api/v1/recorrencias/{id}/gerar", id).param("competencia", "2026-10-01"))
+                .andExpect(status().isOk()).andReturn();
+        long lancamento = objectMapper.readTree(g.getResponse().getContentAsString()).get("id").asLong();
+
+        // Antes: FK fk_lancamento_recorrencia quebrava o delete. Agora desvincula e remove.
+        mockMvc.perform(delete("/api/v1/recorrencias/{id}", id))
+                .andExpect(status().isNoContent());
+
+        // O lancamento gerado permanece (registro financeiro preservado)
+        mockMvc.perform(get("/api/v1/despesas/{id}", lancamento))
+                .andExpect(status().isOk());
     }
 }

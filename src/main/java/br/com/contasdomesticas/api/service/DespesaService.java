@@ -10,6 +10,7 @@ import br.com.contasdomesticas.api.dto.PagamentoRequest;
 import br.com.contasdomesticas.api.exception.AplicacaoException;
 import br.com.contasdomesticas.api.mapper.LancamentoMapper;
 import br.com.contasdomesticas.api.repository.LancamentoRepository;
+import br.com.contasdomesticas.api.repository.RateioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.List;
 public class DespesaService {
 
     private final LancamentoRepository lancamentoRepository;
+    private final RateioRepository rateioRepository;
     private final LancamentoMapper lancamentoMapper;
     private final ResolvedorLancamento resolvedor;
 
@@ -63,7 +65,10 @@ public class DespesaService {
 
     @Transactional
     public void remover(Long id) {
-        lancamentoRepository.delete(buscarEntidade(id));
+        Lancamento despesa = buscarEntidade(id);
+        // Remove o rateio (e seus participantes, via orphanRemoval) antes da despesa
+        rateioRepository.findByLancamentoId(id).ifPresent(rateioRepository::delete);
+        lancamentoRepository.delete(despesa);
     }
 
     private void aplicar(Lancamento lancamento, DespesaRequest request) {

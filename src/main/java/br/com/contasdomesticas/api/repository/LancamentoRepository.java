@@ -3,6 +3,7 @@ package br.com.contasdomesticas.api.repository;
 import br.com.contasdomesticas.api.domain.Lancamento;
 import br.com.contasdomesticas.api.domain.TipoLancamento;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -41,4 +42,9 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     List<Lancamento> findByCarteiraId(Long carteiraId);
 
     Optional<Lancamento> findByRecorrenciaIdAndDataCompetencia(Long recorrenciaId, LocalDate dataCompetencia);
+
+    /** Desvincula da recorrencia os lancamentos ja gerados (mantem os registros financeiros). */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Lancamento l set l.recorrencia = null where l.recorrencia.id = :recorrenciaId")
+    void desvincularRecorrencia(@Param("recorrenciaId") Long recorrenciaId);
 }

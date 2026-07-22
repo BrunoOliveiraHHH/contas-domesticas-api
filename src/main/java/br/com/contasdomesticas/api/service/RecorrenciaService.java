@@ -57,7 +57,10 @@ public class RecorrenciaService {
 
     @Transactional
     public void remover(Long id) {
-        recorrenciaRepository.delete(buscarEntidade(id));
+        Recorrencia recorrencia = buscarEntidade(id);
+        // Desvincula os lancamentos ja gerados (preserva os registros) antes de remover a recorrencia
+        lancamentoRepository.desvincularRecorrencia(id);
+        recorrenciaRepository.delete(recorrencia);
     }
 
     /** Gera o lancamento da competencia informada (idempotente por recorrencia+competencia). */

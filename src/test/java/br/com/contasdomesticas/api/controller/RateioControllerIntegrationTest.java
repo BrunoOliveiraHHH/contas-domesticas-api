@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -89,6 +90,22 @@ class RateioControllerIntegrationTest {
                         .content("{\"tipo\":\"CUSTOM\",\"participantes\":[{\"usuarioId\":" + admin
                             + ",\"percentual\":30},{\"usuarioId\":" + karla + ",\"percentual\":30}]}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveRemoverDespesaMesmoComRateio() throws Exception {
+        long despesa = despesaDe100();
+        long admin = usuarioRepository.findByLogin("admin").orElseThrow().getId();
+        long karla = segundoUsuario(nomeUnico());
+        mockMvc.perform(post("/api/v1/despesas/{id}/rateio", despesa)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tipo\":\"IGUAL\",\"participantes\":[{\"usuarioId\":" + admin
+                            + "},{\"usuarioId\":" + karla + "}]}"))
+                .andExpect(status().isCreated());
+
+        // Antes: FK fk_rateio_lancamento quebrava o delete. Agora o rateio e removido junto.
+        mockMvc.perform(delete("/api/v1/despesas/{id}", despesa))
+                .andExpect(status().isNoContent());
     }
 
     @Test

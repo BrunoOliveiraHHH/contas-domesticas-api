@@ -15,7 +15,19 @@
       }
     ]
   },
-  "event": [],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('status < 400', function () {",
+          "  pm.expect(pm.response.code, pm.response.text()).to.be.below(400);",
+          "});"
+        ]
+      }
+    }
+  ],
   "variable": [
     {
       "key": "baseUrl",
@@ -279,7 +291,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"login\": \"karla\",\n  \"nomeExibicao\": \"Karla\",\n  \"senha\": \"karla123\"\n}",
+              "raw": "{\n  \"login\": \"karla{{$randomInt}}\",\n  \"nomeExibicao\": \"Karla\",\n  \"senha\": \"karla123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -342,7 +354,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"login\": \"karla\",\n  \"nomeExibicao\": \"Karla Linhares\",\n  \"senha\": \"karla123\"\n}",
+              "raw": "{\n  \"login\": \"karla{{$randomInt}}upd\",\n  \"nomeExibicao\": \"Karla Linhares\",\n  \"senha\": \"karla123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -352,12 +364,56 @@
           }
         },
         {
+          "name": "Criar (descartavel)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"karla{{$randomInt}}tmp\",\n  \"nomeExibicao\": \"Karla (tmp)\",\n  \"senha\": \"karla123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('usuarioTmpId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
           "name": "Remover",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/usuarios/{{usuarioId}}",
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{usuarioTmpId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -365,7 +421,7 @@
                 "api",
                 "v1",
                 "usuarios",
-                "{{usuarioId}}"
+                "{{usuarioTmpId}}"
               ]
             }
           }
@@ -466,7 +522,18 @@
                 }
               }
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('carteiraTmpId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Buscar",
@@ -526,7 +593,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/carteiras/{{carteiraId}}",
+              "raw": "{{baseUrl}}/api/v1/carteiras/{{carteiraTmpId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -534,7 +601,7 @@
                 "api",
                 "v1",
                 "carteiras",
-                "{{carteiraId}}"
+                "{{carteiraTmpId}}"
               ]
             }
           }
@@ -697,7 +764,18 @@
                 }
               }
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('categoriaTmpId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Buscar",
@@ -757,7 +835,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/categorias/{{categoriaDespesaId}}",
+              "raw": "{{baseUrl}}/api/v1/categorias/{{categoriaTmpId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -765,7 +843,7 @@
                 "api",
                 "v1",
                 "categorias",
-                "{{categoriaDespesaId}}"
+                "{{categoriaTmpId}}"
               ]
             }
           }
@@ -866,7 +944,18 @@
                 }
               }
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('formaTmpId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Buscar",
@@ -926,7 +1015,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/formas-pagamento/{{formaPagamentoId}}",
+              "raw": "{{baseUrl}}/api/v1/formas-pagamento/{{formaTmpId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -934,7 +1023,7 @@
                 "api",
                 "v1",
                 "formas-pagamento",
-                "{{formaPagamentoId}}"
+                "{{formaTmpId}}"
               ]
             }
           }
@@ -1058,12 +1147,56 @@
           }
         },
         {
+          "name": "Criar (descartavel)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/mercados",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mercados"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Super A (tmp)\",\n  \"tipo\": \"SUPERMERCADO\",\n  \"bairro\": \"Centro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('mercadoTmpId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
           "name": "Remover",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/mercados/{{mercadoId}}",
+              "raw": "{{baseUrl}}/api/v1/mercados/{{mercadoTmpId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1071,7 +1204,7 @@
                 "api",
                 "v1",
                 "mercados",
-                "{{mercadoId}}"
+                "{{mercadoTmpId}}"
               ]
             }
           }
@@ -1122,7 +1255,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Quilograma\",\n  \"sigla\": \"kg\",\n  \"tipo\": \"PESO\",\n  \"fatorParaBase\": 1\n}",
+              "raw": "{\n  \"nome\": \"Caixa\",\n  \"sigla\": \"u{{$randomInt}}\",\n  \"tipo\": \"PESO\",\n  \"fatorParaBase\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1185,7 +1318,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Quilo\",\n  \"sigla\": \"kg\",\n  \"tipo\": \"PESO\",\n  \"fatorParaBase\": 1\n}",
+              "raw": "{\n  \"nome\": \"Quilo\",\n  \"sigla\": \"u{{$randomInt}}\",\n  \"tipo\": \"PESO\",\n  \"fatorParaBase\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1195,12 +1328,56 @@
           }
         },
         {
+          "name": "Criar (descartavel)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/unidades-medida",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "unidades-medida"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Caixa (tmp)\",\n  \"sigla\": \"u{{$randomInt}}\",\n  \"tipo\": \"PESO\",\n  \"fatorParaBase\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('unidadeTmpId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
           "name": "Remover",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/unidades-medida/{{unidadeId}}",
+              "raw": "{{baseUrl}}/api/v1/unidades-medida/{{unidadeTmpId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1208,7 +1385,7 @@
                 "api",
                 "v1",
                 "unidades-medida",
-                "{{unidadeId}}"
+                "{{unidadeTmpId}}"
               ]
             }
           }
@@ -1664,12 +1841,56 @@
           }
         },
         {
+          "name": "Criar (descartavel)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/produtos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "produtos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Arroz 5kg (tmp)\",\n  \"categoriaId\": \"{{categoriaDespesaId}}\",\n  \"unidadeMedidaPadraoId\": \"{{unidadeId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('produtoTmpId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
           "name": "Remover",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/produtos/{{produtoId}}",
+              "raw": "{{baseUrl}}/api/v1/produtos/{{produtoTmpId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1677,7 +1898,7 @@
                 "api",
                 "v1",
                 "produtos",
-                "{{produtoId}}"
+                "{{produtoTmpId}}"
               ]
             }
           }
@@ -1728,7 +1949,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"descricao\": \"Salario\",\n  \"valor\": 5000,\n  \"dataCompetencia\": \"2026-07-05\",\n  \"carteiraId\": \"{{carteiraId}}\",\n  \"categoriaId\": \"{{categoriaReceitaId}}\"\n}",
+              "raw": "{\n  \"descricao\": \"Salario\",\n  \"valor\": 5000,\n  \"dataCompetencia\": \"2026-07-05\",\n  \"carteiraId\": \"{{carteiraId}}\",\n  \"categoriaId\": \"{{categoriaReceitaId}}\",\n  \"dataInicio\": \"2026-07-01\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1791,7 +2012,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"descricao\": \"Salario + extra\",\n  \"valor\": 5500,\n  \"dataCompetencia\": \"2026-07-05\",\n  \"carteiraId\": \"{{carteiraId}}\",\n  \"categoriaId\": \"{{categoriaReceitaId}}\"\n}",
+              "raw": "{\n  \"descricao\": \"Salario + extra\",\n  \"valor\": 5500,\n  \"dataCompetencia\": \"2026-07-05\",\n  \"carteiraId\": \"{{carteiraId}}\",\n  \"categoriaId\": \"{{categoriaReceitaId}}\",\n  \"dataInicio\": \"2026-07-01\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2493,6 +2714,40 @@
               ]
             }
           }
+        },
+        {
+          "name": "Repor estoque",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/listas-compra/{{listaId}}/repor-estoque",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "listas-compra",
+                "{{listaId}}",
+                "repor-estoque"
+              ]
+            },
+            "description": "Adiciona a lista os produtos abaixo do estoque minimo (nao duplica os que ja estao na lista)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status 2xx\", () => pm.expect(pm.response.code).to.be.oneOf([200,201]));",
+                  "pm.test(\"retorna array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "response": []
         },
         {
           "name": "Remover item",

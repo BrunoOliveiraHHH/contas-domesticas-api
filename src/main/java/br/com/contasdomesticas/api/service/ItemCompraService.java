@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -70,8 +72,15 @@ public class ItemCompraService {
     @Transactional
     public List<ItemCompraResponse> reporEstoque(Long listaId) {
         ListaCompra lista = exigirLista(listaId);
+        // Produtos que ja estao na lista: nao adicionar de novo (evita duplicar a cada clique)
+        Set<Long> produtosNaLista = itemCompraRepository.findByListaCompraId(listaId).stream()
+            .map(item -> item.getProduto().getId())
+            .collect(Collectors.toSet());
         List<ItemCompraResponse> adicionados = new ArrayList<>();
         for (Produto produto : produtoRepository.findAbaixoDoMinimo()) {
+            if (produtosNaLista.contains(produto.getId())) {
+                continue;
+            }
             BigDecimal quantidade = produto.getEstoqueMinimo().subtract(produto.getEstoqueAtual());
             if (quantidade.signum() <= 0) {
                 continue;

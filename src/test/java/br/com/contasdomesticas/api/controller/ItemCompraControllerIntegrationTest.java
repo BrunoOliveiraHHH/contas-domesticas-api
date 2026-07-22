@@ -10,6 +10,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -88,5 +89,31 @@ class ItemCompraControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"mercadoId\":1}"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void reporEstoqueNaoDuplicaProdutoJaNaLista() throws Exception {
+        long lista = lista(carteira());
+        criar("/api/v1/produtos", "{\"nome\":\"Detergente\",\"estoqueMinimo\":5,\"estoqueAtual\":1}");
+
+        // 1a reposicao: adiciona ao menos o produto abaixo do minimo
+        mockMvc.perform(post("/api/v1/listas-compra/{listaId}/repor-estoque", lista))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)));
+
+        int itensApos1 = objectMapper.readTree(
+            mockMvc.perform(get("/api/v1/listas-compra/{listaId}/itens", lista))
+                .andReturn().getResponse().getContentAsString()).size();
+
+        // 2a reposicao: nada de novo, pois os produtos ja estao na lista
+        mockMvc.perform(post("/api/v1/listas-compra/{listaId}/repor-estoque", lista))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.length()").value(0));
+
+        int itensApos2 = objectMapper.readTree(
+            mockMvc.perform(get("/api/v1/listas-compra/{listaId}/itens", lista))
+                .andReturn().getResponse().getContentAsString()).size();
+
+        org.junit.jupiter.api.Assertions.assertEquals(itensApos1, itensApos2);
     }
 }

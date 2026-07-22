@@ -139,6 +139,10 @@ public class ListaCompraService {
             item.setComprado(true);
             itemCompraRepository.save(item);
 
+            // soma a quantidade comprada ao estoque atual do produto
+            var prod = item.getProduto();
+            prod.setEstoqueAtual(prod.getEstoqueAtual().add(item.getQuantidade()));
+
             // registra o preco pago no catalogo (origem COMPRA)
             CotacaoProduto compra = new CotacaoProduto();
             compra.setProduto(item.getProduto());

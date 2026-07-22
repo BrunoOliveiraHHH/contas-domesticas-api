@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 /**
  * Produto do catalogo reutilizavel. O item de compra referencia um produto
  * (nao texto livre), entao precos/cotacoes se reaproveitam entre listas.
@@ -42,4 +44,11 @@ public class Produto extends BaseEntity {
 
     @Column(name = "ativo", nullable = false)
     private boolean ativo = true;
+
+    // Estoque: minimo desejado e atual. A comprar = max(0, minimo - atual).
+    @Column(name = "estoque_minimo", nullable = false, precision = 12, scale = 3)
+    private BigDecimal estoqueMinimo = BigDecimal.ZERO;
+
+    @Column(name = "estoque_atual", nullable = false, precision = 12, scale = 3)
+    private BigDecimal estoqueAtual = BigDecimal.ZERO;
 }

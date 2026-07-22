@@ -35,6 +35,12 @@ public class ItemCompraController {
         return itemCompraService.adicionar(listaId, request);
     }
 
+    @PostMapping("/api/v1/listas-compra/{listaId}/repor-estoque")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<ItemCompraResponse> reporEstoque(@PathVariable Long listaId) {
+        return itemCompraService.reporEstoque(listaId);
+    }
+
     @PutMapping("/api/v1/itens/{id}/escolha")
     public ItemCompraResponse escolher(@PathVariable Long id, @Valid @RequestBody EscolhaEstabelecimentoRequest request) {
         return itemCompraService.escolherEstabelecimento(id, request);

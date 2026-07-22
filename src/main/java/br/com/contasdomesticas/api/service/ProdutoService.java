@@ -64,6 +64,12 @@ public class ProdutoService {
         produto.setUnidadeMedidaPadrao(request.unidadeMedidaPadraoId() == null ? null
             : unidadeMedidaRepository.findById(request.unidadeMedidaPadraoId())
                 .orElseThrow(() -> new AplicacaoException("Unidade de medida informada nao existe", HttpStatus.BAD_REQUEST)));
+        if (request.estoqueMinimo() != null) {
+            produto.setEstoqueMinimo(request.estoqueMinimo());
+        }
+        if (request.estoqueAtual() != null) {
+            produto.setEstoqueAtual(request.estoqueAtual());
+        }
     }
 
     private Produto buscarEntidade(Long id) {

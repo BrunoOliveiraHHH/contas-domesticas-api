@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -59,6 +61,29 @@ public class ItemCompraService {
             item.setUnidadeMedida(produto.getUnidadeMedidaPadrao());
         }
         return itemCompraMapper.toResponse(itemCompraRepository.save(item));
+    }
+
+    /**
+     * Repor estoque: adiciona a lista todos os produtos abaixo do minimo, com
+     * quantidade = estoque_minimo - estoque_atual. Retorna os itens adicionados.
+     */
+    @Transactional
+    public List<ItemCompraResponse> reporEstoque(Long listaId) {
+        ListaCompra lista = exigirLista(listaId);
+        List<ItemCompraResponse> adicionados = new ArrayList<>();
+        for (Produto produto : produtoRepository.findAbaixoDoMinimo()) {
+            BigDecimal quantidade = produto.getEstoqueMinimo().subtract(produto.getEstoqueAtual());
+            if (quantidade.signum() <= 0) {
+                continue;
+            }
+            ItemCompra item = new ItemCompra();
+            item.setListaCompra(lista);
+            item.setProduto(produto);
+            item.setQuantidade(quantidade);
+            item.setUnidadeMedida(produto.getUnidadeMedidaPadrao());
+            adicionados.add(itemCompraMapper.toResponse(itemCompraRepository.save(item)));
+        }
+        return adicionados;
     }
 
     @Transactional

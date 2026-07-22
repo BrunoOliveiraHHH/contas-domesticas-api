@@ -50,7 +50,7 @@ class ReceitaControllerIntegrationTest {
         mockMvc.perform(post("/api/v1/receitas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"descricao\":\"Salario\",\"valor\":5000.00,\"dataCompetencia\":\"2026-07-05\","
-                            + "\"carteiraId\":" + c + ",\"categoriaId\":" + cat + "}"))
+                            + "\"dataInicio\":\"2026-07-01\",\"carteiraId\":" + c + ",\"categoriaId\":" + cat + "}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("RECEITA"))
                 .andExpect(jsonPath("$.id").exists());
@@ -64,7 +64,7 @@ class ReceitaControllerIntegrationTest {
         mockMvc.perform(post("/api/v1/receitas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"descricao\":\"Errada\",\"valor\":10.00,\"dataCompetencia\":\"2026-07-05\","
-                            + "\"carteiraId\":" + c + ",\"categoriaId\":" + catDespesa + "}"))
+                            + "\"dataInicio\":\"2026-07-01\",\"carteiraId\":" + c + ",\"categoriaId\":" + catDespesa + "}"))
                 .andExpect(status().isBadRequest());
     }
 

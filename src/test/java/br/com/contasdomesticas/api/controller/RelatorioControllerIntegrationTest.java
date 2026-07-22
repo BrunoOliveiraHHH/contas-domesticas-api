@@ -46,11 +46,13 @@ class RelatorioControllerIntegrationTest {
         long catReceita = categoria("RECEITA");
         long catDespesa = categoria("DESPESA");
         criar("/api/v1/receitas", "{\"descricao\":\"Salario\",\"valor\":5000.00,\"dataCompetencia\":\"2027-05-05\","
-            + "\"carteiraId\":" + c + ",\"categoriaId\":" + catReceita + "}");
+            + "\"dataInicio\":\"2027-05-01\",\"carteiraId\":" + c + ",\"categoriaId\":" + catReceita + "}");
         criar("/api/v1/despesas", "{\"descricao\":\"Aluguel\",\"valor\":2000.00,\"dataCompetencia\":\"2027-05-10\","
             + "\"carteiraId\":" + c + ",\"categoriaId\":" + catDespesa + "}");
 
-        MvcResult r = mockMvc.perform(get("/api/v1/relatorios/saldo").param("periodo", "2027-05"))
+        MvcResult r = mockMvc.perform(get("/api/v1/relatorios/saldo")
+                        .param("periodo", "2027-05")
+                        .param("carteira", String.valueOf(c)))
                 .andExpect(status().isOk())
                 .andReturn();
         JsonNode saldo = objectMapper.readTree(r.getResponse().getContentAsString());

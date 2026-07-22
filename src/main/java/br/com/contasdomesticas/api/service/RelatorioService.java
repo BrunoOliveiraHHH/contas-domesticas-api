@@ -31,18 +31,24 @@ public class RelatorioService {
     @Transactional(readOnly = true)
     public SaldoMesResponse saldoDoMes(String periodo, Long carteiraId) {
         YearMonth ym = periodo(periodo);
+        LocalDate ini = ym.atDay(1);
+        LocalDate fim = ym.atEndOfMonth();
         BigDecimal receitas = BigDecimal.ZERO;
         BigDecimal despesas = BigDecimal.ZERO;
 
-        for (Lancamento l : lancamentoRepository.findByDataCompetenciaBetween(ym.atDay(1), ym.atEndOfMonth())) {
+        // Receitas: contam pela validade (data_inicio/data_fim), com fallback a competencia.
+        for (Lancamento l : lancamentoRepository.findVigentesNoPeriodo(TipoLancamento.RECEITA, ini, fim)) {
             if (carteiraId != null && !carteiraId.equals(l.getCarteira().getId())) {
                 continue;
             }
-            if (l.getTipo() == TipoLancamento.RECEITA) {
-                receitas = receitas.add(l.getValor());
-            } else {
-                despesas = despesas.add(l.getValor());
+            receitas = receitas.add(l.getValor());
+        }
+        // Despesas: pela competencia do mes.
+        for (Lancamento l : lancamentoRepository.findByTipoAndDataCompetenciaBetween(TipoLancamento.DESPESA, ini, fim)) {
+            if (carteiraId != null && !carteiraId.equals(l.getCarteira().getId())) {
+                continue;
             }
+            despesas = despesas.add(l.getValor());
         }
         return new SaldoMesResponse(periodo,
             escala(receitas), escala(despesas), escala(receitas.subtract(despesas)));

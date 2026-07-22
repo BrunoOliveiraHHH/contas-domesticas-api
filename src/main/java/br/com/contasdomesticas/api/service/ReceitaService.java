@@ -58,6 +58,8 @@ public class ReceitaService {
         lancamento.setDescricao(request.descricao());
         lancamento.setValor(request.valor());
         lancamento.setDataCompetencia(request.dataCompetencia());
+        lancamento.setDataInicio(request.dataInicio());
+        lancamento.setDataFim(request.dataFim());
         lancamento.setObservacao(request.observacao());
         lancamento.setCarteira(resolvedor.carteira(request.carteiraId()));
         lancamento.setCategoria(resolvedor.categoria(request.categoriaId(), TipoCategoria.RECEITA));

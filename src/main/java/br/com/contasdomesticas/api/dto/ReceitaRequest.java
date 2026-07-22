@@ -14,6 +14,8 @@ public record ReceitaRequest(
     @NotNull Long carteiraId,
     @NotNull Long categoriaId,
     Long formaPagamentoId,
-    String observacao
+    String observacao,
+    @NotNull LocalDate dataInicio,
+    LocalDate dataFim
 ) {
 }

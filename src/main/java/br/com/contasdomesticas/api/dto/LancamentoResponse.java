@@ -15,6 +15,8 @@ public record LancamentoResponse(
     LocalDate dataCompetencia,
     LocalDate dataVencimento,
     LocalDate dataPagamento,
+    LocalDate dataInicio,
+    LocalDate dataFim,
     StatusLancamento status,
     Long carteiraId,
     Long categoriaId,

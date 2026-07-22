@@ -19,9 +19,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +57,12 @@ public class RelatorioService {
             despesas = despesas.add(l.getValor());
         }
         // Recorrencias/assinaturas ativas: contam no dashboard sem gerar lancamento.
+        // Se a recorrencia ja tem lancamento gerado no mes, o lancamento ja conta (evita duplicar).
+        Set<Long> jaGeradas = new HashSet<>(lancamentoRepository.recorrenciasComLancamentoNoPeriodo(ini, fim));
         for (Recorrencia r : recorrenciaRepository.findAtivasNoPeriodo(ini, fim)) {
+            if (jaGeradas.contains(r.getId())) {
+                continue;
+            }
             if (carteiraId != null && !carteiraId.equals(r.getCarteira().getId())) {
                 continue;
             }
@@ -87,9 +94,11 @@ public class RelatorioService {
             agrupado.total = agrupado.total.add(l.getValor());
             totalGeral = totalGeral.add(l.getValor());
         }
-        // Recorrencias/assinaturas ativas do mesmo tipo entram no agrupamento.
+        // Recorrencias/assinaturas ativas do mesmo tipo entram no agrupamento (sem duplicar geradas).
+        Set<Long> jaGeradas = new HashSet<>(
+            lancamentoRepository.recorrenciasComLancamentoNoPeriodo(ym.atDay(1), ym.atEndOfMonth()));
         for (Recorrencia r : recorrenciaRepository.findAtivasNoPeriodo(ym.atDay(1), ym.atEndOfMonth())) {
-            if (r.getTipo() != tipoFiltro) {
+            if (r.getTipo() != tipoFiltro || jaGeradas.contains(r.getId())) {
                 continue;
             }
             BigDecimal contrib = r.getValor().multiply(BigDecimal.valueOf(ocorrenciasNoMes(r, ym)));

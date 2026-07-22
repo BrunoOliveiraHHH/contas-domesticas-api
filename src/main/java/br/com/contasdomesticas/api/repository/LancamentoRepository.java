@@ -26,6 +26,13 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
         @Param("inicio") LocalDate inicio,
         @Param("fim") LocalDate fim);
 
+    /** Ids das recorrencias que ja tem lancamento gerado no periodo (para nao contar em dobro). */
+    @Query("select distinct l.recorrencia.id from Lancamento l " +
+        "where l.recorrencia is not null and l.dataCompetencia between :inicio and :fim")
+    List<Long> recorrenciasComLancamentoNoPeriodo(
+        @Param("inicio") LocalDate inicio,
+        @Param("fim") LocalDate fim);
+
     List<Lancamento> findByTipoAndDataCompetenciaBetween(
         TipoLancamento tipo, LocalDate inicio, LocalDate fim);
 

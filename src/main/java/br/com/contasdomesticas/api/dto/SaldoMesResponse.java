@@ -6,6 +6,9 @@ public record SaldoMesResponse(
     String periodo,
     BigDecimal receitas,
     BigDecimal despesas,
-    BigDecimal saldo
+    BigDecimal saldo,
+    BigDecimal aPagar,
+    BigDecimal atrasadas,
+    BigDecimal assinaturas
 ) {
 }

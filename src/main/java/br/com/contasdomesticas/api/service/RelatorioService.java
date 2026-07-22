@@ -4,6 +4,7 @@ import br.com.contasdomesticas.api.domain.Categoria;
 import br.com.contasdomesticas.api.domain.Frequencia;
 import br.com.contasdomesticas.api.domain.Lancamento;
 import br.com.contasdomesticas.api.domain.Recorrencia;
+import br.com.contasdomesticas.api.domain.StatusLancamento;
 import br.com.contasdomesticas.api.domain.TipoLancamento;
 import br.com.contasdomesticas.api.dto.PorCategoriaItemResponse;
 import br.com.contasdomesticas.api.dto.SaldoMesResponse;
@@ -39,8 +40,12 @@ public class RelatorioService {
         YearMonth ym = periodo(periodo);
         LocalDate ini = ym.atDay(1);
         LocalDate fim = ym.atEndOfMonth();
+        LocalDate hoje = LocalDate.now();
         BigDecimal receitas = BigDecimal.ZERO;
         BigDecimal despesas = BigDecimal.ZERO;
+        BigDecimal aPagar = BigDecimal.ZERO;
+        BigDecimal atrasadas = BigDecimal.ZERO;
+        BigDecimal assinaturas = BigDecimal.ZERO;
 
         // Receitas: contam pela validade (data_inicio/data_fim), com fallback a competencia.
         for (Lancamento l : lancamentoRepository.findVigentesNoPeriodo(TipoLancamento.RECEITA, ini, fim)) {
@@ -49,12 +54,18 @@ public class RelatorioService {
             }
             receitas = receitas.add(l.getValor());
         }
-        // Despesas: pela competencia do mes.
+        // Despesas: pela competencia do mes (+ quebra por status: a pagar / atrasadas).
         for (Lancamento l : lancamentoRepository.findByTipoAndDataCompetenciaBetween(TipoLancamento.DESPESA, ini, fim)) {
             if (carteiraId != null && !carteiraId.equals(l.getCarteira().getId())) {
                 continue;
             }
             despesas = despesas.add(l.getValor());
+            if (l.getStatus() != StatusLancamento.PAGO) {
+                aPagar = aPagar.add(l.getValor());
+                if (l.getDataVencimento() != null && l.getDataVencimento().isBefore(hoje)) {
+                    atrasadas = atrasadas.add(l.getValor());
+                }
+            }
         }
         // Recorrencias/assinaturas ativas: contam no dashboard sem gerar lancamento.
         // Se a recorrencia ja tem lancamento gerado no mes, o lancamento ja conta (evita duplicar).
@@ -71,10 +82,12 @@ public class RelatorioService {
                 receitas = receitas.add(contrib);
             } else {
                 despesas = despesas.add(contrib);
+                assinaturas = assinaturas.add(contrib);
             }
         }
         return new SaldoMesResponse(periodo,
-            escala(receitas), escala(despesas), escala(receitas.subtract(despesas)));
+            escala(receitas), escala(despesas), escala(receitas.subtract(despesas)),
+            escala(aPagar), escala(atrasadas), escala(assinaturas));
     }
 
     @Transactional(readOnly = true)

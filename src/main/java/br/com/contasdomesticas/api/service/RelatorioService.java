@@ -1,12 +1,15 @@
 package br.com.contasdomesticas.api.service;
 
 import br.com.contasdomesticas.api.domain.Categoria;
+import br.com.contasdomesticas.api.domain.Frequencia;
 import br.com.contasdomesticas.api.domain.Lancamento;
+import br.com.contasdomesticas.api.domain.Recorrencia;
 import br.com.contasdomesticas.api.domain.TipoLancamento;
 import br.com.contasdomesticas.api.dto.PorCategoriaItemResponse;
 import br.com.contasdomesticas.api.dto.SaldoMesResponse;
 import br.com.contasdomesticas.api.exception.AplicacaoException;
 import br.com.contasdomesticas.api.repository.LancamentoRepository;
+import br.com.contasdomesticas.api.repository.RecorrenciaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ public class RelatorioService {
     private static final BigDecimal CEM = BigDecimal.valueOf(100);
 
     private final LancamentoRepository lancamentoRepository;
+    private final RecorrenciaRepository recorrenciaRepository;
 
     @Transactional(readOnly = true)
     public SaldoMesResponse saldoDoMes(String periodo, Long carteiraId) {
@@ -50,6 +54,18 @@ public class RelatorioService {
             }
             despesas = despesas.add(l.getValor());
         }
+        // Recorrencias/assinaturas ativas: contam no dashboard sem gerar lancamento.
+        for (Recorrencia r : recorrenciaRepository.findAtivasNoPeriodo(ini, fim)) {
+            if (carteiraId != null && !carteiraId.equals(r.getCarteira().getId())) {
+                continue;
+            }
+            BigDecimal contrib = r.getValor().multiply(BigDecimal.valueOf(ocorrenciasNoMes(r, ym)));
+            if (r.getTipo() == TipoLancamento.RECEITA) {
+                receitas = receitas.add(contrib);
+            } else {
+                despesas = despesas.add(contrib);
+            }
+        }
         return new SaldoMesResponse(periodo,
             escala(receitas), escala(despesas), escala(receitas.subtract(despesas)));
     }
@@ -71,6 +87,21 @@ public class RelatorioService {
             agrupado.total = agrupado.total.add(l.getValor());
             totalGeral = totalGeral.add(l.getValor());
         }
+        // Recorrencias/assinaturas ativas do mesmo tipo entram no agrupamento.
+        for (Recorrencia r : recorrenciaRepository.findAtivasNoPeriodo(ym.atDay(1), ym.atEndOfMonth())) {
+            if (r.getTipo() != tipoFiltro) {
+                continue;
+            }
+            BigDecimal contrib = r.getValor().multiply(BigDecimal.valueOf(ocorrenciasNoMes(r, ym)));
+            if (contrib.signum() == 0) {
+                continue;
+            }
+            Categoria categoria = r.getCategoria();
+            Agrupado agrupado = porCategoria.computeIfAbsent(
+                categoria.getId(), k -> new Agrupado(categoria.getNome()));
+            agrupado.total = agrupado.total.add(contrib);
+            totalGeral = totalGeral.add(contrib);
+        }
 
         BigDecimal total = totalGeral;
         return porCategoria.entrySet().stream()
@@ -80,6 +111,19 @@ public class RelatorioService {
                 escala(e.getValue().total),
                 percentual(e.getValue().total, total)))
             .toList();
+    }
+
+    /** Quantas vezes a recorrencia ocorre no mes (MENSAL=1, SEMANAL~4, ANUAL=1 no mes de inicio). */
+    private int ocorrenciasNoMes(Recorrencia r, YearMonth ym) {
+        Frequencia f = r.getFrequencia();
+        if (f == Frequencia.MENSAL) {
+            return 1;
+        }
+        if (f == Frequencia.SEMANAL) {
+            return 4;
+        }
+        // ANUAL: conta no mes de aniversario (mes de data_inicio).
+        return r.getDataInicio().getMonthValue() == ym.getMonthValue() ? 1 : 0;
     }
 
     private BigDecimal percentual(BigDecimal parte, BigDecimal total) {

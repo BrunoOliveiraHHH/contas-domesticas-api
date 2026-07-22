@@ -73,8 +73,16 @@ class RelatorioControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
         JsonNode itens = objectMapper.readTree(r.getResponse().getContentAsString());
-        assertThat(itens).hasSize(1);
-        assertThat(itens.get(0).get("total").decimalValue()).isEqualByComparingTo("800.00");
-        assertThat(itens.get(0).get("percentual").decimalValue()).isEqualByComparingTo("100.00");
+        // A categoria criada deve aparecer com o total da despesa (podem existir outras
+        // categorias no H2 compartilhado, incluindo recorrencias/assinaturas ativas).
+        JsonNode alvo = null;
+        for (JsonNode item : itens) {
+            if (item.get("categoriaId").asLong() == catDespesa) {
+                alvo = item;
+                break;
+            }
+        }
+        assertThat(alvo).isNotNull();
+        assertThat(alvo.get("total").decimalValue()).isEqualByComparingTo("800.00");
     }
 }
